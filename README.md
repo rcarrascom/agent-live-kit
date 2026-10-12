@@ -89,7 +89,7 @@ More detail: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md).
 
 **Why does an agent show as "unmatched" or "sub-agent"?** The page needs Claude Code's `meta.json` file to learn which agent type a run belongs to. See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
-**Where is the history stored?** `.agent-live/events.jsonl` in your project (add it to `.gitignore`; the kit's own `.gitignore` already does). Keep size down with `history.maxLines`.
+**Where is the history stored?** `.agent-live/events.jsonl` in your project (add `.agent-live/` to your `.gitignore`: it can contain command lines and messages). Keep size down with `history.maxLines`.
 
 **Can I add my own tools or outside AIs to the map?** Yes: add a node, then an activity rule such as "when a shell command contains `ollama`, light the Ollama node". Examples in [docs/CONFIG.md](docs/CONFIG.md).
 
