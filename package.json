@@ -8,7 +8,7 @@
   "files": ["bin", "src", "public", "schema", "recipes", "docs", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"],
   "engines": { "node": ">=20" },
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test",
     "start": "node bin/agent-live.mjs start",
     "doctor": "node bin/agent-live.mjs doctor"
   },

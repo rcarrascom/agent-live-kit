@@ -32,7 +32,7 @@ export function loadConfig({ cwd = process.cwd(), config } = {}) {
     if (!errors.length) errors = validate(SCHEMA, raw);
   }
   const root = file ? path.dirname(file) : path.resolve(cwd);
-  return { cfg: withDefaults(raw, root), root, file, raw, errors };
+  return { cfg: withDefaults(errors.length ? {} : raw, root), root, file, raw, errors };   // a broken config falls back to defaults so doctor can keep checking
 }
 
 export function withDefaults(raw, root) {
