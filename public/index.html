@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Live</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">AGENT <i>LIVE</i></div><div class="proj" id="proj"></div>
+  <div class="conn" id="conn"><span class="dot" id="cdot"></span><span id="ctxt">connecting</span></div>
+  <select id="sess" aria-label="Session"></select>
+  <div class="replay">
+    <button class="btn" id="fxbtn" aria-pressed="true" title="Flow effects on/off">Effects</button><button class="btn" id="rbtn" aria-pressed="false">Replay</button>
+    <span id="rctl" hidden><button class="btn" id="rplay">Play</button><input type="range" id="rrange" min="0" max="0" value="0"><span id="rlab"></span></span>
+  </div>
+  <div class="zoom" role="group" aria-label="Size"><button data-z="S" aria-pressed="false" title="Small">S</button><button data-z="M" aria-pressed="true" title="Medium">M</button><button data-z="L" aria-pressed="false" title="Large">L</button></div>
+  <div class="kpis">
+    <div class="kpi"><b id="k_act">0</b><span>active</span></div>
+    <div class="kpi"><b id="k_calls">0</b><span>tool calls</span></div>
+    <div class="kpi"><b id="k_tok">0</b><span>tokens</span></div>
+    <div class="kpi"><b id="k_ev">0</b><span>events</span></div>
+  </div>
+</header>
+<div class="banner">Local only: events come from your Claude Code hooks through the agent-flow relay. <a href="?sim=1" id="simlink">show simulated test agents</a></div>
+<main>
+  <section class="panel team" aria-label="Team"><div class="ph">Team <small id="teamn"></small><span class="unm" id="unm" hidden></span><button class="chev" data-hide="team" title="Hide the team panel (T)" aria-label="Hide team panel">&#9664;</button></div><div class="grid" id="grid"></div></section>
+  <div class="right">
+    <section class="panel flow" aria-label="Live flow"><div class="ph">Live flow <button class="focusbtn" id="focusbtn" title="Fill the window (key F, Esc to return)">&#9974; Focus</button><span class="tabs" role="group" aria-label="Flow skin"><button data-skin="team" aria-pressed="true">Team live</button><button data-skin="flow" aria-pressed="false">Flow</button><button data-skin="classic" aria-pressed="false">Classic skin</button></span><span id="keepwrap" hidden><label class="keep">keep finished <select id="keep"><option value="5">5 min</option><option value="30">30 min</option><option value="session">session</option></select></label></span><small>hand-offs travel along the lines; chips = tool calls of the last 10 s</small></div><div class="flowwrap" id="flowwrap"><canvas id="fx"></canvas><svg id="svg" viewBox="0 0 960 300" role="img" aria-label="Agent flow"><g id="layer"></g><g id="pk"></g></svg><div id="tl" class="tl" hidden><canvas id="fx2"></canvas><div id="tlnodes"></div></div></div><div class="legend" id="legend"></div><div class="ticker" id="ticker" aria-live="off"></div><div class="tcard" id="tcard" hidden></div></section>
+    <button class="lograil" id="rail-log" data-show="log" hidden title="Show the activity log (L)">&#9650; Activity log <b id="rail-logn"></b></button>
+    <section class="panel log" aria-label="Activity log">
+      <div class="ph">Activity log <small id="logn"></small><button class="chev" data-hide="log" title="Hide the activity log (L)" aria-label="Hide activity log">&#9660;</button></div>
+      <div class="lf" id="lf"></div>
+      <div class="rows" id="rows"></div>
+    </section>
+  </div>
+</main>
+<button class="rail" id="rail-team" data-show="team" hidden title="Show the team panel (T)">&#9654; TEAM <b id="rail-n"></b></button>
+<div class="toast" id="toast"></div>
+<script src="rules.js"></script>
+<script src="identity.js"></script>
+<script src="fx.js"></script>
+<script src="classic.js"></script>
+<script src="tlfx.js"></script>
+<script src="team.js"></script>
+<script src="model.js"></script>
+<script src="ingest.js"></script>
+<script src="cards.js"></script>
+<script src="flow.js"></script>
+<script src="log.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

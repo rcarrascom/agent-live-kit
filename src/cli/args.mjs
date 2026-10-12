@@ -1,4 +1,5 @@
 // Minimal argument parser: --flag, --key value, --key=value. Everything else goes to _.
+const BOOLEAN = new Set(["force", "dry-run", "json", "install", "instant", "loop", "open", "no-relay", "help", "fast"]);
 export function parseArgs(argv) {
   const out = { _: [] };
   for (let i = 0; i < argv.length; i++) {
@@ -6,7 +7,7 @@ export function parseArgs(argv) {
     if (a.startsWith("--")) {
       const eq = a.indexOf("=");
       if (eq > 0) out[a.slice(2, eq)] = a.slice(eq + 1);
-      else if (argv[i + 1] !== undefined && !argv[i + 1].startsWith("--") && ["config", "port", "config-dir", "cwd", "session"].includes(a.slice(2))) out[a.slice(2)] = argv[++i];
+      else if (!BOOLEAN.has(a.slice(2)) && argv[i + 1] !== undefined && !argv[i + 1].startsWith("--")) out[a.slice(2)] = argv[++i];
       else out[a.slice(2)] = true;
     } else out._.push(a);
   }

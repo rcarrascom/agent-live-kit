@@ -106,8 +106,12 @@ export function createAgentLive({ cfg, root, upstream = true, watchMetas = true,
   const json = (res, o, code = 200) => { res.writeHead(code, { "content-type": "application/json", "cache-control": "no-store" }); res.end(JSON.stringify(o)); };
   function agentsJson() {
     const { agents } = readAgents(root, cfg.agentsDirs);
-    const team = teamPayload(cfg, root), byId = Object.fromEntries(team.nodes.map(n => [n.id, n]));
-    const list = agents.map(a => ({ name: a.name, description: a.description, model: a.model, tools: a.tools || "all", lane: (byId[a.name] || {}).lane || "", role: (byId[a.name] || {}).role || "" }));
+    const team = teamPayload(cfg, root), files = Object.fromEntries(agents.map(a => [a.name, a]));
+    const list = team.nodes.filter(n => !["people", "claude", "tools", "outside", "other"].includes(n.band)).map(n => {
+      const f = files[n.id] || {};
+      return { name: n.id, description: f.description || n.role || "", model: f.model || n.cost || "", tools: f.tools || n.sees || "all", lane: n.lane || "", role: n.role || "" };
+    });
+    for (const a of agents) if (!list.some(x => x.name === a.name)) list.push({ name: a.name, description: a.description, model: a.model, tools: a.tools || "all", lane: "", role: "" });
     list.unshift({ name: "orchestrator", description: cfg.orchestrator.role, model: "session model", tools: "all", lane: "", role: "main session" });
     return list;
   }
