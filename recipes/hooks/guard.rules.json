@@ -1,0 +1,31 @@
+{
+  "_about": "Rules for guard.mjs. field = command (Bash / PowerShell) or file_path (Edit / Write). pattern = regex, case-insensitive. unless = optional regex that cancels the block. Copy this file to .claude/guard.rules.json and edit.",
+  "rules": [
+    { "id": "destructive-git", "tools": ["Bash", "PowerShell"], "field": "command",
+      "pattern": "git\\s+(reset\\s+--hard|clean\\s+-\\w*f|push\\s+(.*\\s)?(--force\\b|-f\\b)|branch\\s+-D|stash\\s+(drop|clear)|checkout\\s+--\\s+\\.|restore\\s+\\.)",
+      "message": "destructive git command. Ask the human first, or use a normal commit / a new branch." },
+    { "id": "autostash", "tools": ["Bash", "PowerShell"], "field": "command",
+      "pattern": "git\\s+(-\\S+\\s+)*(pull|rebase|merge)\\b[^\\n|;&]*--autostash",
+      "message": "no --autostash while other agents have uncommitted edits (it can stash their work)." },
+    { "id": "kill-by-name", "tools": ["Bash", "PowerShell"], "field": "command",
+      "pattern": "(taskkill.*\\s/im\\s|stop-process.*-name\\s|pkill\\s|killall\\s)",
+      "message": "never kill programs by name (it can close the human's own windows). Stop only the PID you started." },
+    { "id": "recursive-delete", "tools": ["Bash", "PowerShell"], "field": "command",
+      "pattern": "\\brm\\s+-\\w*r\\w*f|\\brm\\s+-\\w*f\\w*r|remove-item\\b[^\\n|;]*-recurse|\\brmdir\\s+/s|\\brd\\s+/s",
+      "unless": "(/temp/|/tmp/|scratch|\\$env:temp|node_modules)",
+      "message": "recursive delete outside a temp / scratch folder. Delete single files, or ask the human." },
+    { "id": "secrets-read", "tools": ["Bash", "PowerShell"], "field": "command",
+      "pattern": "\\b(cat|type|get-content|head|tail|more|echo|print)\\b[^\\n|;]*(\\.env\\b|id_rsa|\\.npmrc|credentials|secrets?\\.(json|ya?ml))",
+      "message": "never read or print secret files." },
+    { "id": "secrets-write", "tools": ["Edit", "Write", "NotebookEdit"], "field": "file_path",
+      "pattern": "(\\.env$|\\.env\\.|id_rsa|\\.npmrc$)",
+      "message": "secret file: never write it." },
+    { "id": "vendored", "tools": ["Edit", "Write", "NotebookEdit"], "field": "file_path",
+      "pattern": "/(vendor|third_party|node_modules)/",
+      "message": "vendored / third-party code is never edited here. Work around it in our own code." },
+    { "id": "shared-log-overwrite", "tools": ["Write"], "field": "file_path",
+      "pattern": "docs/(status|decisions|agent_log)\\.md$",
+      "message": "never overwrite a shared log with Write (it can erase rows other agents added). Use Edit to append or change one row." },
+    { "kind": "commit-prefix", "tools": ["Bash", "PowerShell"], "prefixes": ["feat", "fix", "revert", "docs", "research", "chore", "test", "refactor"] }
+  ]
+}
