@@ -1,0 +1,16 @@
+Agent Live Kit
+Copyright (c) 2026 Agent Live Kit contributors. MIT licence (see LICENSE).
+
+This kit reads the event stream of "agent-flow" (npm package agent-flow-app,
+https://github.com/patoles/agent-flow, Apache License 2.0, Copyright by its
+authors, "patoles" on GitHub). It does not bundle, copy or modify agent-flow:
+the relay is started on demand with `npx agent-flow-app@0.9.1`.
+
+The visual-effects techniques in public/tlfx.js (a blurred bloom pass,
+cached radial-gradient glow sprites, a parallax starfield, a hex-grid backdrop,
+glowing trail particles and spinner arcs) were studied from agent-flow's
+webview client and re-implemented from scratch. No agent-flow source code
+was copied. Credit and thanks to the agent-flow authors.
+
+The Apache License 2.0 text is available at
+https://www.apache.org/licenses/LICENSE-2.0
