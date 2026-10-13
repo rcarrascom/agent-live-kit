@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "bin": { "agent-live": "bin/agent-live.mjs" },
-  "files": ["bin", "src", "public", "schema", "recipes", "docs", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"],
+  "files": ["bin", "src", "public", "schema", "recipes", "skill", "docs", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"],
   "engines": { "node": ">=20" },
   "scripts": {
     "test": "node --test",

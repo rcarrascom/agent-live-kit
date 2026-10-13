@@ -23,16 +23,27 @@ You need [Node.js](https://nodejs.org) 20 or newer and Claude Code. Works on Win
 
 ### Option 1: let Claude install it (easiest)
 
-Open Claude Code in the project you want to watch and paste this (replace `<repo-url>` with this repository's address):
+Open Claude Code in the project you want to watch and paste this (replace `https://github.com/rcarrascom/agent-live-kit.git` with this repository's address):
 
-> Install Agent Live Kit from `<repo-url>`: clone it next to my project (not inside it), then in my project folder run `node <clone>/bin/agent-live.mjs init`, then `doctor` and fix anything it flags, then `start --open`. Tell me when to open a new Claude Code session.
+> Install Agent Live Kit from `https://github.com/rcarrascom/agent-live-kit.git`: clone it next to my project (not inside it), then in my project folder run `node <clone>/bin/agent-live.mjs init`, then `doctor` and fix anything it flags, then `start --open`. Tell me when to open a new Claude Code session.
 
 Claude does the steps below for you. The one thing it cannot do is restart itself: open a **new** Claude Code session afterwards, because hooks are read when a session starts.
+
+### Option 1b: one skill, then say "install agent live"
+
+Copy the skill once and Claude knows how to install, repair and start the kit by itself, in any project:
+
+```bash
+mkdir -p ~/.claude/skills/agent-live
+git clone https://github.com/rcarrascom/agent-live-kit.git /tmp/alk && cp /tmp/alk/skill/agent-live/SKILL.md ~/.claude/skills/agent-live/
+```
+
+Then open Claude Code in your project and type `/agent-live` (or "install agent live"). It asks once before touching your Claude settings.
 
 ### Option 2: manual
 
 ```bash
-git clone <repo-url> ~/agent-live-kit             # once, anywhere outside your project
+git clone https://github.com/rcarrascom/agent-live-kit.git ~/agent-live-kit             # once, anywhere outside your project
 cd your-project                                   # the folder where you run Claude Code
 node ~/agent-live-kit/bin/agent-live.mjs init     # 1. scans your project, writes agent-live.config.json
 node ~/agent-live-kit/bin/agent-live.mjs doctor   # 2. checks everything and tells you how to fix what is missing
