@@ -19,15 +19,20 @@ Tell the user in two sentences: the first `start` merges hooks into the Claude s
 - `git --version` must work.
 - Decide the project: the current folder, the one where the user runs Claude Code. It should have `.claude/agents/*.md` (if it has none, `init` still works and builds a minimal team).
 
-## 2. Get the kit (once per computer)
+## 2. Find or get the kit (once per computer)
 
-Default location: `~/agent-live-kit` (call it KIT). If it already exists, run `git -C KIT pull` instead of cloning. Never clone inside the user's project.
+KIT is the folder that contains `bin/agent-live.mjs`. Look in this order and use the first that exists:
+1. `~/agent-live-kit`
+2. `~/agent-live-kit-main` (what a GitHub zip unpacks to), also in `~/Downloads` and `~/Desktop`
+3. A folder the user names. If they sent a zip and it is not unpacked yet, unpack it to `~/agent-live-kit` (it may contain one nested `agent-live-kit-main` folder; KIT is the one that holds `bin/`).
+
+If none exists, clone it (never inside the user's project). If KIT is a git clone, run `git -C KIT pull` to update; a zip copy needs no update.
 
 ```bash
 git clone https://github.com/rcarrascom/agent-live-kit.git ~/agent-live-kit
 ```
 
-If the clone fails with an authentication error (the repository is private), run `gh auth login` if `gh` exists, otherwise ask the user to sign in to GitHub or to send a zip. Then retry. On Windows, `~` is `%USERPROFILE%`; use the real path.
+If the clone fails with an authentication error (the repository is private), run `gh auth login` if `gh` exists; otherwise ask the user to accept the GitHub invite and sign in, or to send the zip. Then retry. On Windows, `~` is `%USERPROFILE%`; use the real path.
 
 ## 3. Set up the project
 
