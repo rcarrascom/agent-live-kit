@@ -17,20 +17,31 @@ When you run Claude Code with sub-agents, the terminal shows one long scroll of 
 
 Agent Live Kit turns that stream into a picture you can keep on a second monitor. It is **local only** (nothing leaves your computer), has **no dependencies** (just Node.js), and works for **any project**: you describe your team in one small file, or let `agent-live init` write it for you.
 
-## Quick start (5 minutes, 3 commands)
+## Install
 
-You need [Node.js](https://nodejs.org) 20 or newer and Claude Code.
+You need [Node.js](https://nodejs.org) 20 or newer and Claude Code. Works on Windows, macOS and Linux.
+
+### Option 1: let Claude install it (easiest)
+
+Open Claude Code in the project you want to watch and paste this (replace `<repo-url>` with this repository's address):
+
+> Install Agent Live Kit from `<repo-url>`: clone it next to my project (not inside it), then in my project folder run `node <clone>/bin/agent-live.mjs init`, then `doctor` and fix anything it flags, then `start --open`. Tell me when to open a new Claude Code session.
+
+Claude does the steps below for you. The one thing it cannot do is restart itself: open a **new** Claude Code session afterwards, because hooks are read when a session starts.
+
+### Option 2: manual
 
 ```bash
-cd your-project                      # the folder where you run Claude Code
-npx agent-live-kit init              # 1. scans your project, writes agent-live.config.json
-npx agent-live-kit doctor            # 2. checks everything and tells you how to fix what is missing
-npx agent-live-kit start --open      # 3. starts the relay and the page, opens your browser
+git clone <repo-url> ~/agent-live-kit             # once, anywhere outside your project
+cd your-project                                   # the folder where you run Claude Code
+node ~/agent-live-kit/bin/agent-live.mjs init     # 1. scans your project, writes agent-live.config.json
+node ~/agent-live-kit/bin/agent-live.mjs doctor   # 2. checks everything and tells you how to fix what is missing
+node ~/agent-live-kit/bin/agent-live.mjs start --open   # 3. starts the relay and the page, opens your browser
 ```
 
-(If you cloned this repository instead, replace `npx agent-live-kit` with `node /path/to/agent-live-kit/bin/agent-live.mjs`, or run `npm link` once and type `agent-live`.)
+Optional: `cd ~/agent-live-kit && npm link` once, then type `agent-live init`, `agent-live doctor`, `agent-live start --open` anywhere.
 
-Just want to look first? `npx agent-live-kit simulate` opens a demo with a fake team. No agents, no setup.
+Just want to look first? `node ~/agent-live-kit/bin/agent-live.mjs simulate` opens a demo with a fake team. No agents, no setup.
 
 Then use Claude Code as usual **in a new session** (hooks are read when a session starts). Agents appear on the map as they work.
 
