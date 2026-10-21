@@ -36,7 +36,7 @@ function fillSessions() {
   const sel = $("sess"), ids = Object.keys(sessions);
   const sig = (userPicked ? "p" : "a") + ids.map(i => i + (sessions[i].label || "") + (sessions[i].status || "") + (titles[i] || "").length + (accounts[i] || "")).join("|") + selSession;
   if (sel.dataset.sig === sig) return; sel.dataset.sig = sig;
-  sel.innerHTML = ids.length ? `<option value="auto" ${userPicked ? "" : "selected"}>Latest session (auto-follow)</option>` + ids.map(i => `<option value="${i}" ${userPicked && i === selSession ? "selected" : ""}>${esc((accounts[i] ? "Account " + accounts[i] + " · " : "") + String(titles[i] || sessions[i].label || "session").replace(/\s+/g, " ").slice(0, 48) + " · " + i.slice(0, 6) + (sessions[i].status === "completed" ? " (ended)" : ""))}</option>`).join("") : `<option>no session yet</option>`;
+  sel.innerHTML = ids.length ? `<option value="auto" ${userPicked ? "" : "selected"}>Latest session (auto-follow)</option>` + ids.map(i => `<option value="${esc(i)}" ${userPicked && i === selSession ? "selected" : ""}>${esc((accounts[i] ? "Account " + accounts[i] + " · " : "") + String(titles[i] || sessions[i].label || "session").replace(/\s+/g, " ").slice(0, 48) + " · " + i.slice(0, 6) + (sessions[i].status === "completed" ? " (ended)" : ""))}</option>`).join("") : `<option>no session yet</option>`;
 }
 $("sess").onchange = e => {
   if (e.target.value === "auto") { userPicked = false; if (hist.length) selSession = hist[hist.length - 1].event.sessionId; }

@@ -17,6 +17,7 @@ function renderFlow() {
   const svg = $("svg"); svg.setAttribute("viewBox", `0 0 ${VW} ${H}`);
   const geo = { VW, H, nodes: {}, edges: {} }, st2 = { agents: {}, edges: {}, chips: {}, ctx: null };
   let s = "";
+  const iconChip = (c2, col, fam, x, y) => `<g opacity="${Math.max(.15, 1 - (nowTs - c2.ts) / CHIP_MS)}" transform="translate(${x} ${y})"><title>${esc(c2.tool + " " + (c2.arg || ""))}</title><circle cx="9" cy="9" r="9" fill="#0d1523" stroke="${col}" stroke-opacity=".8"/><g transform="translate(2.5 2.5) scale(.65)">${TOOLICONS.svg(fam, 20, col).replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "")}</g></g>`;
   const nodeBox = (x, y, name, a, label, born) => {
     const c = colorOf(name), st = a ? a.status : "idle", on = st === "tool" || st === "thinking" || st === "perm";
     const fill = on ? "#18304f" : "#14203a", op = st === "done" ? .7 : (st === "idle" ? .5 : 1);
@@ -54,17 +55,14 @@ function renderFlow() {
     // chips next to the node
     const chips = model.chips.filter(c2 => c2.agent === ed.child && nowTs - c2.ts < CHIP_MS).slice(NARROW ? -1 : -3);
     chips.forEach((c2, j) => {
-      const t = `${c2.tool} ${c2.arg}`.slice(0, NARROW ? 24 : 30), w = Math.min(230, t.length * 6.2 + 16), yy = NARROW ? y + NH + 4 : y + 2 + j * 20, cx0 = NARROW ? x2 : x2 + NW + 12;
-      s += `<g opacity="${1 - (nowTs - c2.ts) / CHIP_MS * .6}"><rect x="${cx0}" y="${yy}" width="${w}" height="18" rx="9" fill="#2a2113" stroke="${"var(--ember)"}" stroke-opacity=".6"/><text x="${cx0 + 8}" y="${yy + 12.5}" font-size="10" font-family="JetBrains Mono,monospace" fill="var(--ember)">${esc(t)}</text></g>`;
+      const fam = TOOLICONS.famOf(c2.tool), col = TOOLICONS.COL[fam], yy = NARROW ? y + NH + 4 : y + 2 + j * 22, cx0 = NARROW ? x2 + j * 22 : x2 + NW + 12;
+      s += iconChip(c2, col, fam, cx0, yy);
     });
   });
   geo.nodes.orchestrator = { x: OX, y: oy, w: NW, h: NH, cx: OX + NW / 2, cy: cy, col: colorRaw("orchestrator"), chipX: OX, chipY: oy + NH + 10, chipStep: 20 };
   s += nodeBox(OX, oy, "orchestrator", orch, "orchestrator");
   const oc = model.chips.filter(c2 => c2.agent === "orchestrator" && nowTs - c2.ts < CHIP_MS).slice(-3);
-  oc.forEach((c2, j) => {
-    const t = `${c2.tool} ${c2.arg}`.slice(0, 30), w = Math.min(NW + 40, t.length * 6.2 + 16), yy = oy + NH + 10 + j * 20;
-    s += `<g opacity="${1 - (nowTs - c2.ts) / CHIP_MS * .6}"><rect x="${OX}" y="${yy}" width="${w}" height="18" rx="9" fill="#2a2113" stroke="var(--ember)" stroke-opacity=".6"/><text x="${OX + 8}" y="${yy + 12.5}" font-size="10" font-family="JetBrains Mono,monospace" fill="var(--ember)">${esc(t)}</text></g>`;
-  });
+  oc.forEach((c2, j) => { const fam = TOOLICONS.famOf(c2.tool), col = TOOLICONS.COL[fam]; s += iconChip(c2, col, fam, OX + j * 22, oy + NH + 10); });
   if (!model.edges.length) {
     s += `<text x="${CX}" y="${cy - 150}" fill="var(--muted)" font-size="${NARROW ? 11 : 13}">${NARROW ? "no sub-agent in this session" : "No sub-agent in this session yet. The idle team is drawn faintly; pick another session above or wait for a spawn."}</text>`;
     const ghosts = (typeof TN !== "undefined" ? TN.filter(x => isAgentBand(x.band)) : []).slice(0, 14);

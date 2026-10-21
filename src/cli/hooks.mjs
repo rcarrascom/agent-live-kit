@@ -20,7 +20,8 @@ export async function run(args) {
     return 0;
   }
   if (!fs.existsSync(hookScriptPath())) { console.error(red(`${hookScriptPath()} does not exist yet. Run \`agent-live start\` once (the relay writes it), then try again.`)); return 1; }
-  const f = installHooks(dir);
-  console.log(green(`Hooks merged into ${f} (a copy of the old file is next to it as .agent-live.bak). Restart Claude Code sessions to pick them up.`));
+  let f;
+  try { f = installHooks(dir); } catch (e) { console.error(red(e.message)); return 1; }
+  console.log(green(`Hooks merged into ${f} (the original is kept next to it as .agent-live.bak). Restart Claude Code sessions to pick them up.`));
   return 0;
 }

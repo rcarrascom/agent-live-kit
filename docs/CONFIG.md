@@ -132,6 +132,16 @@ Simulated events are never written to the file.
 ### `keepFinishedMinutes` (integer, default `30`)
 How long the Classic tab keeps finished runs (the page also has a selector: 5 min / 30 min / session; your choice is remembered in the browser).
 
+### `jobs.pidDirs` (array of folders, default none)
+Optional. Background runs started by a script or scheduler (`claude -p ...`) do not appear like interactive sessions. If your script writes one `<name>.pid` file (the process id inside) per run into a folder listed here, each file whose process is alive becomes a live session `job-<name>` on the map, and finishes when the process exits. The title is the file name, or the first `# heading` of a `<name>.md` next to it. Tool calls are read from the newest session transcript of this project's Claude folders. Folders must be inside the project; pid files older than 24 h are ignored.
+
+```json
+{ "jobs": { "pidDirs": ["logs/runs"] } }
+```
+
+### `history.file` must stay inside the project
+A config that points the history file outside the project folder is rejected (a cloned project's config is not trusted to write elsewhere).
+
 ### `telemetry` (boolean)
 Ignored: the relay is always started with telemetry off.
 

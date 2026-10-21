@@ -230,9 +230,8 @@
       const f = flies[i]; f.u += dt / .5; if (f.u >= 1) { flies.splice(i, 1); continue; }
       const e = 1 - Math.pow(1 - f.u, 3), x = f.x0 + (f.x1 - f.x0) * e, y = f.y0 + (f.y1 - f.y0) * e;
       cx.globalCompositeOperation = "source-over"; cx.globalAlpha = 1 - f.u * f.u;
-      cx.font = "10px 'JetBrains Mono',monospace"; const w = cx.measureText(f.label).width + 14;
-      cx.fillStyle = "rgba(20,30,50,.9)"; cx.strokeStyle = f.col; cx.lineWidth = 1.2; rr(x - 2, y - 9, w, 18, 9); cx.fill(); cx.stroke();
-      cx.fillStyle = f.col; cx.textAlign = "left"; cx.fillText(f.label, x + 5, y + 3.5);
+      cx.fillStyle = "rgba(20,30,50,.9)"; cx.strokeStyle = f.col; cx.lineWidth = 1.2; cx.beginPath(); cx.arc(x + 6, y, 9, 0, 6.2832); cx.fill(); cx.stroke();
+      TOOLICONS.draw(cx, TOOLICONS.famOfCol(f.col), x + 6, y, 12, f.col);
       cx.globalCompositeOperation = "lighter";
     }
     // sparks

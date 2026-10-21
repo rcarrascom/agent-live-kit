@@ -32,6 +32,11 @@ export function loadConfig({ cwd = process.cwd(), config } = {}) {
     if (!errors.length) errors = validate(SCHEMA, raw);
   }
   const root = file ? path.dirname(file) : path.resolve(cwd);
+  // A project's config is not trusted: the history file (appended to on every event) must stay inside the project folder.
+  if (!errors.length && raw.history && raw.history.file) {
+    const rel = path.relative(root, path.resolve(root, raw.history.file));
+    if (rel.startsWith("..") || path.isAbsolute(rel)) errors.push(`history.file "${raw.history.file}" is outside the project folder. Use a path inside it (default: .agent-live/events.jsonl).`);
+  }
   return { cfg: withDefaults(errors.length ? {} : raw, root), root, file, raw, errors };   // a broken config falls back to defaults so doctor can keep checking
 }
 
@@ -49,6 +54,7 @@ export function withDefaults(raw, root) {
     accounts: r.accounts || [],
     human: { id: "human", name: "You", role: "The person who gives the tasks, answers questions and approves permissions.", ...(r.human || {}) },
     orchestrator: { id: "orchestrator", name: "Claude", role: "The main Claude Code session. It splits the task and hands pieces to the sub-agents.", byAccount: {}, ...(r.orchestrator || {}) },
+    jobs: { pidDirs: (r.jobs && r.jobs.pidDirs) || [] },
     relayNode: r.relayNode === undefined ? "agent-flow" : r.relayNode,
     bands,
     stages: r.stages || STAGES,

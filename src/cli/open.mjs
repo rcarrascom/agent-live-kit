@@ -12,7 +12,8 @@ export function openUrl(url) {
 
 export async function run(args) {
   const { cfg } = loadConfig({ cwd: path.resolve(args.cwd || process.cwd()), config: args.config });
-  const url = `http://127.0.0.1:${args.port || cfg.port}`;
+  const port = Number.isInteger(+args.port) && +args.port > 0 && +args.port < 65536 ? +args.port : cfg.port;   // never pass raw text to the shell
+  const url = `http://127.0.0.1:${port}`;
   console.log("Opening " + url);
   openUrl(url);
   return 0;

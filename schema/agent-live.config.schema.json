@@ -31,6 +31,10 @@
       "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "role": { "type": "string" },
         "byAccount": { "type": "object", "description": "account label -> node id of another main-session node", "additionalProperties": { "type": "string" } } }
     },
+    "jobs": {
+      "type": "object", "additionalProperties": false, "description": "Optional: show headless background runs (one pid file per run) as live sessions.",
+      "properties": { "pidDirs": { "type": "array", "items": { "type": "string" }, "description": "Folders inside the project with one <name>.pid file per running job." } }
+    },
     "relayNode": { "type": "string", "description": "Node id lit green while the relay answers. Empty = none." },
     "bands": {
       "type": "object", "description": "band id -> label and colour",

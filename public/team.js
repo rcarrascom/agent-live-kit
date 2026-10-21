@@ -193,19 +193,22 @@ function renderTeamLive() {
   if (!TLFXSIG || TLFXSIG !== L.sig) { TLFXSIG = L.sig; TLFX.setLayout(lay); } else TLFX.setLayout(lay);
   TLFX.setStates({ nodes: sNodes, ctx: model.ctx ? { pct: model.ctx.tokens / (model.ctx.max || 1000000) } : null });
   const unmN = Object.values(model.agents).filter(a => a.name !== "orchestrator" && a.name !== "subagent" && baseOf(a.name) === "sub-agent").length;
-  $("legend").innerHTML = `${unmN ? `<span class="unm" title="runs the matcher could not type yet">unmatched: ${unmN}</span> ` : ""}<b>${working}</b> working now &nbsp;<b>${recent}</b> recently active (60 s) &nbsp; of ${L.all.length} nodes &nbsp; <i style="--k:#7cc8ff"></i>working (glow) <i style="--k:#5f8bb5"></i>recently active <i style="--k:#ffb454"></i>waiting for you <i style="--k:#6fd3a0"></i>up / done <i style="--k:#2c4a72"></i>dim = not seen &nbsp; beams = who is using what`;
+  $("legend").innerHTML = `${unmN ? `<span class="unm" title="runs the matcher could not type yet">unmatched: ${unmN}</span> ` : ""}<b>${working}</b> working now &nbsp;<b>${recent}</b> recently active (60 s) &nbsp; of ${L.all.length} nodes &nbsp; <i style="--k:#7cc8ff"></i>working (glow) <i style="--k:#5f8bb5"></i>recently active <i style="--k:#ffb454"></i>waiting for you <i style="--k:#6fd3a0"></i>up / done <i style="--k:#2c4a72"></i>dim = not seen &nbsp; beams = who is using what ${TOOLICONS.legendHTML()}`;
   if (TOPEN) showCard(TOPEN, ST);
 }
 let TLFXSIG = "";
 // floating tool chips: full tool text drifts up from the working card and fades (CSS-animated, no per-frame work)
 function floatChip(id, text, col) {
   const e = TLPOS[id], host = $("tlnodes"); if (!e || !host) return;
-  if (host.querySelectorAll(".tchip").length > 7) host.querySelector(".tchip").remove();
-  const c = document.createElement("div"); c.className = "tchip"; c.style.setProperty("--c", col || "#ffb454");
-  let x = e.x + 6 + Math.random() * Math.min(40, e.w * .4), y = e.y - 4;
-  if (e.side) { x = e.x + e.w + 10; y = e.y + e.h / 2 - 14 + Math.random() * 16; if (x > host.clientWidth - 300) x = e.x - 300; }
-  c.style.left = Math.min(x, host.clientWidth - 280) + "px"; c.style.top = y + "px"; c.textContent = text;
-  c.addEventListener("animationend", () => c.remove()); host.appendChild(c);
+  if (host.querySelectorAll(".tchip").length > 9) host.querySelector(".tchip").remove();
+  const fam = TOOLICONS.famOfCol(col), c = document.createElement("div"); c.className = "tchip ic"; c.style.setProperty("--c", col || "#ffb454");
+  c.innerHTML = TOOLICONS.svg(fam, 14, col); c.setAttribute("aria-hidden", "true");   // full text: node "now" line, card and log
+  // beside the card, never on top of its text: right edge (left edge when there is no room), stacked a little apart
+  const slot = (floatChip.n = ((floatChip.n || 0) + 1) % 4);
+  let x = e.x + e.w + 6 + (slot % 2) * 20, y = e.y + 4 + slot * 14;
+  if (x > host.clientWidth - 30) x = Math.max(2, e.x - 26 - (slot % 2) * 20);
+  c.style.left = x + "px"; c.style.top = Math.min(y, e.y + Math.max(8, e.h - 24)) + "px";
+  c.addEventListener("animationend", () => c.remove()); setTimeout(() => c.remove(), 4200); host.appendChild(c);   // timeout: reduced-motion turns the animation off
 }
 function showCard(id, ST) {
   const n = TLAY && TLAY.all.find(x => x.id === id), box = $("tcard"); if (!n) { box.hidden = true; return; }

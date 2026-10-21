@@ -1,6 +1,6 @@
 {
   "name": "agent-live-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A live map of your Claude Code agent team: who is working, what tools they use, hand-offs, and a persistent log. Local, zero dependencies.",
   "type": "module",
   "license": "MIT",

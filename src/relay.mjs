@@ -39,6 +39,7 @@ export function npxAvailable() {
 export function startRelay(root, port) {
   const child = spawn(process.platform === "win32" ? "npx.cmd" : "npx", ["-y", RELAY_PACKAGE, "--no-open", "-p", String(port)],
     { cwd: root, detached: true, stdio: "ignore", windowsHide: true, shell: process.platform === "win32", env: { ...process.env, AGENT_FLOW_TELEMETRY: "false" } });
+  child.on("error", () => {});   // npx missing: doctor reports it; do not crash the page server
   child.unref();
   return child.pid;
 }
@@ -72,8 +73,11 @@ export function installHooks(configDir, home = os.homedir()) {
   const file = settingsPath(configDir);
   let s = {};
   if (fs.existsSync(file)) {
-    fs.copyFileSync(file, file + ".agent-live.bak");
-    s = JSON.parse(fs.readFileSync(file, "utf8").replace(/^﻿/, ""));
+    try { s = JSON.parse(fs.readFileSync(file, "utf8").replace(/^﻿/, "")); }
+    catch (e) { throw new Error(`${file} is not valid JSON (${e.message}). Fix it first; nothing was changed.`); }
+    // keep the FIRST backup: a second run must not overwrite the user's original with an already-edited copy
+    const bak = file + ".agent-live.bak";
+    if (!fs.existsSync(bak)) fs.copyFileSync(file, bak);
   } else fs.mkdirSync(configDir, { recursive: true });
   const snip = hookSnippet(home).hooks;
   s.hooks = s.hooks || {};

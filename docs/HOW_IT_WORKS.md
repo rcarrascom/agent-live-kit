@@ -62,4 +62,4 @@ These techniques were studied from agent-flow's client and **re-implemented**; s
 | `GET /team.json`, `/rules.json`, `/agents.json` | team map, activity rules (defaults + yours), agent files |
 | `GET /status` | health, counts, `unmatched`, history file path |
 | `GET /health` | `{ agentLive: true }` (used by `doctor` and `start`) |
-| `POST /inject` | send events by hand (used by `simulate`); never persisted |
+| `POST /inject` | send events by hand (used by `simulate`); never persisted; max 1 MB. Every path answers 403 to a foreign `Host` or `Origin`. |

@@ -120,7 +120,7 @@ More detail: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md).
 - **It only knows what Claude Code's events show.** A tool, script or AI that Claude Code never calls from a command stays dim ("no activity seen"). Outside AIs are only lit when a command or MCP tool name mentions them (you write that rule). Nothing is faked.
 - **No cost figures.** The stream has no prices; tokens are estimates from tool results plus context size.
 - **It collects from the moment it runs.** Runs that started before the relay did have no type.
-- **Local, single-user.** There is no login and no sharing. It listens on `127.0.0.1` only.
+- **Local, single-user.** There is no login and no sharing. It listens on `127.0.0.1` only and refuses requests with a foreign `Host` or `Origin`, so other web pages cannot read it or feed it events. Do not expose the port with a tunnel or proxy: the history can contain command lines and messages.
 - **Tested on Windows.** The code uses only Node's built-in modules and no shell-specific parts, but macOS and Linux were not run by the author. Please report problems.
 - **The relay is a third-party package** (agent-flow, Apache-2.0), pinned to a version. See [NOTICE](NOTICE).
 

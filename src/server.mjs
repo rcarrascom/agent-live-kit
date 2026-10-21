@@ -9,11 +9,24 @@ import { readAgents } from "./agents.mjs";
 import { claudeConfigDirs, claudeProjectDirs } from "./paths.mjs";
 import { createHistory } from "./history.mjs";
 import { createMetaIndex } from "./metas.mjs";
+import { createJobs } from "./jobs.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PUBLIC_DIR = path.join(HERE, "..", "public");
 const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml" };
 const SEEN_MAX = 6000;
+const MAX_BODY = 1024 * 1024;   // /inject bodies above 1 MB are refused
+const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]"]);
+
+// Only the page itself may talk to this server. A foreign Host header (DNS rebinding) or a foreign Origin (another web page
+// posting to 127.0.0.1) is refused; plain tools such as curl or `agent-live simulate` send neither and still work.
+export function requestAllowed(req) {
+  const host = String(req.headers.host || "").toLowerCase();
+  if (!LOCAL_HOSTS.has(host.replace(/:\d+$/, ""))) return false;
+  const origin = req.headers.origin;
+  if (origin !== undefined) { try { if (new URL(origin).host.toLowerCase() !== host) return false; } catch { return false; } }
+  return true;
+}
 
 export function createAgentLive({ cfg, root, upstream = true, watchMetas = true, publicDir = PUBLIC_DIR }) {
   const hist = createHistory(cfg.history);
@@ -23,6 +36,8 @@ export function createAgentLive({ cfg, root, upstream = true, watchMetas = true,
 
   const configDirs = claudeConfigDirs(cfg);
   const metas = createMetaIndex({ cfg, getProjectDirs: () => claudeProjectDirs(cfg, root, configDirs) });
+
+  const jobs = createJobs({ cfg, root, ingest: m => ingest(m), getProjectDirs: () => claudeProjectDirs(cfg, root, configDirs) });
 
   const broadcast = obj => { const s = `data: ${JSON.stringify(obj)}\n\n`; for (const c of clients) { try { c.write(s); } catch {} } };
   const isSim = id => String(id).startsWith("sim-");
@@ -65,9 +80,10 @@ export function createAgentLive({ cfg, root, upstream = true, watchMetas = true,
   function ingest(msg, sim = false) {
     if (!msg || typeof msg !== "object") return;
     if (msg.type === "agent-event-batch") { for (const e of msg.events || []) ingest({ type: "agent-event", event: e }, sim); return; }
+    if (msg.type === "agent-event" && (!msg.event || typeof msg.event !== "object")) throw new Error("agent-event needs an event object");
     metaApply(msg);
     if (msg.type === "agent-event") {
-      const e = msg.event || {};
+      const e = msg.event;
       if (!sim) { const k = evKey(e); if (seen.has(k)) return; seen.add(k); if (seen.size > SEEN_MAX) seen.delete(seen.values().next().value); }
       if (e.sessionId && !sessions[e.sessionId]) sessions[e.sessionId] = { id: e.sessionId, label: e.sessionId.slice(0, 8), status: "active" };
     }
@@ -121,6 +137,7 @@ export function createAgentLive({ cfg, root, upstream = true, watchMetas = true,
     return { runs: [...runInfo.values()].filter(r => ok(r.sessionId)), events: ring.filter(x => ok(x.event ? x.event.sessionId : "")), sessions: ss, accounts: acc, upstream: upstreamUp, seq };
   }
   function handler(req, res) {
+    if (!requestAllowed(req)) { res.writeHead(403, { "content-type": "text/plain" }); return res.end("forbidden: this server only answers its own page on 127.0.0.1"); }
     const url = new URL(req.url, "http://x"), p = url.pathname;
     if (p === "/events") {
       res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache", connection: "keep-alive" });
@@ -137,20 +154,22 @@ export function createAgentLive({ cfg, root, upstream = true, watchMetas = true,
     if (p === "/health") return json(res, { agentLive: true, project: cfg.project });
     if (p === "/status") return json(res, { agentLive: true, project: cfg.project, upstream: upstreamUp, clients: clients.size, buffered: ring.length, seq, runsKnown: metas.metas.length, unmatched, historyFile: hist.file, historyWritable: hist.writable });
     if (p === "/inject" && req.method === "POST") {
-      let b = ""; req.on("data", d => b += d);
-      req.on("end", () => { try { const m = JSON.parse(b); for (const x of Array.isArray(m) ? m : [m]) ingest(x, true); json(res, { ok: true }); } catch (e) { json(res, { error: String(e) }, 400); } });
+      let b = "", tooBig = false;
+      req.on("data", d => { if (tooBig) return; b += d; if (b.length > MAX_BODY) { tooBig = true; json(res, { error: "body too large" }, 413); req.destroy(); } });
+      req.on("end", () => { if (tooBig) return; try { const m = JSON.parse(b); for (const x of Array.isArray(m) ? m : [m]) ingest(x, true); json(res, { ok: true }); } catch { json(res, { error: "invalid event payload" }, 400); } });
       return;
     }
     if (p === "/clear-sim" && req.method === "POST") { for (let i = ring.length - 1; i >= 0; i--) if (ring[i]._sim) ring.splice(i, 1); return json(res, { ok: true }); }
     const file = p === "/" ? "index.html" : path.basename(p);
     const fp = path.join(publicDir, file);
-    if (MIME[path.extname(fp)] && fs.existsSync(fp)) { res.writeHead(200, { "content-type": MIME[path.extname(fp)], "cache-control": "no-store" }); return res.end(fs.readFileSync(fp)); }
+    if (MIME[path.extname(fp)] && file !== "package.json" && fs.existsSync(fp)) { res.writeHead(200, { "content-type": MIME[path.extname(fp)], "cache-control": "no-store" }); return res.end(fs.readFileSync(fp)); }
     res.writeHead(404); res.end("not found");
   }
 
   function start(port = cfg.port, host = "127.0.0.1") {
     hist.load(o => { if (o._seq > seq) seq = o._seq; replayOne(o); });
     if (watchMetas) { metas.scan(); timers.push(setInterval(metas.scan, 3000)); }
+    if (watchMetas && jobs.enabled) timers.push(setInterval(jobs.scan, 3000));
     if (upstream) {
       const probe = async () => { try { const r = await fetch(cfg.relayUrl + "/", { signal: AbortSignal.timeout(1500) }); setUp(r.ok || r.status < 500); } catch { setUp(false); } };
       timers.push(setInterval(probe, 2000)); connectUpstream();
@@ -166,5 +185,5 @@ export function createAgentLive({ cfg, root, upstream = true, watchMetas = true,
     for (const c of clients) { try { c.end(); } catch {} }
     return new Promise(r => { if (!httpServer) return r(); httpServer.close(() => r()); if (httpServer.closeAllConnections) httpServer.closeAllConnections(); });
   }
-  return { start, stop, ingest, hist, metas, sessions, runInfo, annotate, get seq() { return seq; } };
+  return { start, stop, ingest, hist, metas, jobs, sessions, runInfo, annotate, get seq() { return seq; } };
 }

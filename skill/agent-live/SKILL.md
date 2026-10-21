@@ -32,7 +32,7 @@ If none exists, clone it (never inside the user's project). If KIT is a git clon
 git clone https://github.com/rcarrascom/agent-live-kit.git ~/agent-live-kit
 ```
 
-If the clone fails with an authentication error (the repository is private), run `gh auth login` if `gh` exists; otherwise ask the user to accept the GitHub invite and sign in, or to send the zip. Then retry. On Windows, `~` is `%USERPROFILE%`; use the real path.
+If the clone fails (no network, or git is not set up), ask the user for a zip of the kit and unpack it as described above. Then retry. On Windows, `~` is `%USERPROFILE%`; use the real path.
 
 ## 3. Set up the project
 
