@@ -99,5 +99,5 @@ test("the large demo team is a valid map and its scenario runs", async () => {
   let n = 0;
   await runLargeScenario({ sessionStart: m => al.ingest(m, true), post: async (type, payload) => { al.ingest({ type: "agent-event", event: { time: ++n, type, payload, sessionId: "demo-t" } }, true); } });
   assert.ok(n > 60);
-  assert.ok(!JSON.stringify([cfg.project, cfg.human, cfg.nodes, cfg.activityRules]).match(/[A-Za-z]:\|/Users/|/home/|@/), "demo data has no paths or emails");
+  assert.ok(!JSON.stringify([cfg.project, cfg.human, cfg.nodes, cfg.activityRules]).match(new RegExp("[A-Za-z]:\\\\|/Users/|/home/|@")), "demo data has no paths or emails");
 });
