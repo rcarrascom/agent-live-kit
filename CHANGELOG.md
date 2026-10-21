@@ -16,7 +16,8 @@ Fixes
 Features
 - Tool calls are small fading icons by family (read, write, run, search, web, other) with a key in the legend, in Team live, Flow and the canvas. The full text stays in the node card and the log.
 - Optional headless job runs (`jobs.pidDirs`) shown as live sessions.
-- 7 new tests (security, hooks backup, config confinement, jobs): 56 in total.
+- `simulate --team large`: a fictional busy team (about 30 boxes, 9 runs, a permission request) with three new screenshots in docs/img (`large-*.png`).
+- 8 new tests (security, hooks backup, config confinement, jobs, large demo): 57 in total.
 
 ## 0.1.0 (first public version)
 

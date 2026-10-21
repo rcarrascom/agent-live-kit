@@ -89,3 +89,15 @@ test("jobs is off by default", () => {
   const root = tmpDir("al-jobs-off-");
   assert.equal(createJobs({ cfg: withDefaults({}, root), root, ingest() {}, getProjectDirs: () => [] }).enabled, false);
 });
+
+test("the large demo team is a valid map and its scenario runs", async () => {
+  const { largeDemoConfig, runLargeScenario } = await import("../src/demo-large.mjs");
+  const { teamProblems } = await import("../src/config.mjs");
+  const root = tmpDir("al-large-"), cfg = largeDemoConfig(root, 0);
+  assert.deepEqual(teamProblems(cfg, root), []);
+  const al = createAgentLive({ cfg, root, upstream: false, watchMetas: false });
+  let n = 0;
+  await runLargeScenario({ sessionStart: m => al.ingest(m, true), post: async (type, payload) => { al.ingest({ type: "agent-event", event: { time: ++n, type, payload, sessionId: "demo-t" } }, true); } });
+  assert.ok(n > 60);
+  assert.ok(!JSON.stringify([cfg.project, cfg.human, cfg.nodes, cfg.activityRules]).match(/[A-Za-z]:\|/Users/|/home/|@/), "demo data has no paths or emails");
+});

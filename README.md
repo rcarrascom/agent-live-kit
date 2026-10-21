@@ -6,6 +6,10 @@
 
 *(The picture is the built-in demo: a made-up web-app team. `agent-live simulate` shows it on your machine in one command.)*
 
+![A busier team: about 30 boxes, nine runs, one waiting for permission](docs/img/large-team-live.png)
+
+*(`agent-live simulate --team large`: a bigger made-up team. Flow and Classic views of the same session: [flow](docs/img/large-flow.png), [classic](docs/img/large-classic.png).)*
+
 ## The problem it solves
 
 When you run Claude Code with sub-agents, the terminal shows one long scroll of text. You cannot tell at a glance:
@@ -97,7 +101,7 @@ More detail: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md).
 | `agent-live init` | Reads `.claude/agents/*.md`, guesses a band (research, design, build, check, review, ops, outside) for each agent, detects your tools (git, npm, pip, cargo, go, make, docker, CI...), writes `agent-live.config.json` and **explains each choice**. `--dry-run` previews, `--force` overwrites. |
 | `agent-live doctor` | **The check tool.** Green / yellow / red lines for Node version, config validity, agent files, Claude's session folder, hooks, relay, ports, history file, a test event round trip, orphan nodes, rule syntax. Each problem comes with a concrete fix. Exit code 1 if anything is red. `--json` for scripts. |
 | `agent-live start` | Starts the relay if it is not running (telemetry off) and the page. Prints the address. It never kills anything. `--open`, `--no-relay`, `--port N`. |
-| `agent-live simulate` | A demo team with scripted events. `--instant`, `--loop`, `--port N`, or `--inject URL` to send the events to a page that is already running. |
+| `agent-live simulate` | A demo team with scripted events. `--team large` shows a busy team of about 30 boxes. `--instant`, `--loop`, `--port N`, or `--inject URL` to send the events to a page that is already running. |
 | `agent-live open` | Opens the page in your browser. |
 | `agent-live hooks` | Shows (or, with `--install --config-dir DIR`, merges) the Claude Code hooks. |
 

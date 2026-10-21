@@ -9,7 +9,7 @@ Usage: agent-live <command> [options]
   init        scan this project and write agent-live.config.json   (--force, --dry-run)
   doctor      check everything and say how to fix what is wrong     (--json)
   start       start the relay (if needed) and the page              (--no-relay, --open)
-  simulate    demo team with fake events, no agents needed          (--port, --instant, --loop)
+  simulate    demo team with fake events, no agents needed          (--team large, --port, --instant, --loop)
   open        open the page in your browser
   hooks       show or install the Claude Code hooks                 (--install, --config-dir DIR)
 
